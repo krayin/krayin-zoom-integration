@@ -1,0 +1,1 @@
+<link rel="stylesheet" href="{{ asset('vendor/zoom-meeting/assets/css/admin.css') }}">
