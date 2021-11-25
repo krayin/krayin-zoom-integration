@@ -5,12 +5,26 @@
 @push('scripts')
     <script type="text/javascript">
         $(function() {
-            $('.video-conference').append('<button type="button" class="btn btn-sm btn-secondary-outline" id="create-zoom-link"><i class="icon zoom-logo"></i>Zoom</button>');
+            var account = @json(app('\Webkul\ZoomMeeting\Repositories\AccountRepository')->findOneByField('user_id', auth()->user()->id));
 
-            $('#create-zoom-link').on('click', function(e) {
-                window.app.pageLoaded = false;
+            if (! account) {
+                $('.video-conference').append('<a href="{{ route('admin.zoom_meeting.index') }}" target="_blank" class="btn btn-sm btn-secondary-outline connect-account" id="connect-zoom-account"><i class="icon zoom-logo"></i>Connect Zoom Account</a>');
+            } else {
+                $('.video-conference').append('<button type="button" class="btn btn-sm btn-secondary-outline create-link" id="create-zoom-link"><i class="icon zoom-logo"></i>Zoom</button>');
 
-                window.axios.post(`{{ route('admin.zoom_meeting.create_link') }}`, {
+                $('#create-zoom-link').on('click', function(e) {
+                    window.app.pageLoaded = false;
+
+                    var formElement = $('.video-conference').parents('form');
+
+                    window.axios.post(`{{ route('admin.zoom_meeting.create_link') }}`, {
+                        'title': formElement.find('input[name="title"]').val(),
+                        'schedule_from': formElement.find('input[name="schedule_from"]').val(),
+                        'schedule_to': formElement.find('input[name="schedule_to"]').val(),
+                        'participants': {
+                            'users': $("input[name='participants[users][]").map(function(){return $(this).val();}).get(),
+                            'persons': $("input[name='participants[persons][]").map(function(){return $(this).val();}).get(),
+                        }
                     }).then(response => {
                         window.app.pageLoaded = true;
 
@@ -18,9 +32,11 @@
 
                         $('#activity-comment').val(response.data.comment);
 
-                        $('.video-conference').append('<div class="join-zoom-link"><a href="' + response.data.link + '" target="_blank" class="btn btn-sm btn-secondary-outline">Join Zoom Meeting</a><i class="icon trash-icon" id="remove-zoom-button"></i></div>');
+                        $('.video-conference').append('<span class="join-zoom-link join-link"><a href="' + response.data.link + '" target="_blank" class="btn btn-sm btn-secondary-outline">Join Zoom Meeting</a><i class="icon trash-icon" id="remove-zoom-button"></i></span>');
 
-                        $('#create-zoom-link').hide();
+                        $('.create-link').hide();
+
+                        $('.connect-account').hide();
                     })
                     .catch(error => {
                         window.app.pageLoaded = true;
@@ -30,15 +46,18 @@
                             message : error.response.data.message
                         });
                     });
-            });
+                });
 
-            $('.video-conference').delegate('#remove-zoom-button', 'click', function(e) {
-                $('.join-zoom-link').remove();
+                $('.video-conference').delegate('#remove-zoom-button', 'click', function(e) {
+                    $('.join-link').remove();
 
-                $('#create-zoom-link').show();
+                    $('.create-link').show();
 
-                $('input[name=location]').val('');
-            });
+                    $('.connect-account').show();
+
+                    $('input[name=location]').val('');
+                });
+            }
         });
     </script>
 @endpush

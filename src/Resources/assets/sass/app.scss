@@ -99,7 +99,10 @@
 }
 
 .video-conference {
-    #create-zoom-link {
+    #create-zoom-link,
+    #connect-zoom-account {
+        margin-right: 10px;
+
         .icon {
             width: 20px;
             height: 20px;
