@@ -12,13 +12,13 @@
     },
     "autoload": {
         "psr-4": {
-            "Webkul\\Zoom\\": "src/"
+            "Webkul\\ZoomMeeting\\": "src/"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "Webkul\\Zoom\\Providers\\ZoomServiceProvider"
+                "Webkul\\ZoomMeeting\\Providers\\ZoomMeetingServiceProvider"
             ],
             "aliases": {}
         }
